@@ -1,0 +1,82 @@
+App.java
+------------
+package com.ashsoft;
+
+public class App 
+{
+    public static void main( String[] args )
+    {
+    	Student std= new Student("S-111","ASHISH","Hyd");
+    	std.getStudentDetails();
+        
+    }
+}
+------------------------------------------------------------------------------------------------------
+Student.java
+------------------
+package com.ashsoft;
+
+public class Student {
+	
+	String sid;
+	String sname;
+	String saddr;
+	
+	public Student(String sid,String sname,String saddr)
+	{
+		this.sid=sid;
+		this.sname=sname;
+		this.saddr=saddr;
+	}
+	
+	public void getStudentDetails()
+	{
+		System.out.println("Student Details");
+		System.out.println("-----------------------");
+		System.out.println("Student ID      :"+sid);
+		System.out.println("Student Name    :"+sname);
+		System.out.println("Student Address :"+saddr);
+	}
+}
+
+---------------------------------------------------------------------------------------------------------
+pom.xml
+--------------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ashsoft</groupId>
+  <artifactId>mvnapp01</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>mvnapp01</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId> <!-- Add this plugin Explicitly -->
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
