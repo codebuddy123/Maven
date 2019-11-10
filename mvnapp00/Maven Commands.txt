@@ -1,0 +1,14 @@
+
+mvn --version  --checks maven version
+
+mvn archetypes:generate  --->generates archetypes available
+create a project:- Follow onscreen instructions
+compile a project:- mvn compile
+Running a project
+==================
+1)Running testcase:- mvn test
+2)Running main App:
+-----------------------------------
+a)prepare a JAR file:- mvn package
+b)set classpath to the JAR location which exists under target folder
+c)Execute App.java using  java package_name.App
