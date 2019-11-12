@@ -1,0 +1,129 @@
+
+Preparing manually Dependency for ojdbc6.jar file
+---------------------------------------------------------------------------
+mvn install:install-file -DgroupId=oracle -DartifactId=oracle-jdbc -Dpackaging=jar -Dversion=11.2-xe -DgeneratePom=true -Dfile=C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar
+
+Run the above command, go to the local repo and find pom file,copy the dependency details into the project pom for using oracle database in the application.
+-------------------------------------------------------------------------------------------------------
+pom.xml
+--------------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.ashsoft</groupId>
+  <artifactId>mvnapp02</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>mvnapp02</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+  	<groupId>oracle</groupId>
+  	<artifactId>oracle-jdbc</artifactId>
+  	<version>11.2-xe</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+	<dependency>
+    	<groupId>mysql</groupId>
+    	<artifactId>mysql-connector-java</artifactId>
+    	<version>8.0.14</version>
+   </dependency>   
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId> <!-- Add this plugin Explicitly -->
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+-----------------------------------------------------------------------------------------------------
+JdbcApp.java
+--------------------
+package com.ashsoft.jdbc;
+
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+
+public class JdbcApp {
+	Connection con=null;
+	Statement st=null;
+	ResultSet rs=null;
+	
+	public JdbcApp() {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			con=DriverManager.getConnection("jdbc:mysql://localhost:3306/durgadb","root","ashish");
+			st=con.createStatement();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public void getStudentDetails()
+	{
+		try {
+			rs=st.executeQuery("select * from emp1");
+			System.out.println("ENO\tENAME\tESAL\tEADDR");
+			System.out.println("-----------------------------------");
+			while(rs.next())
+			{
+				System.out.print(rs.getInt("ENO")+"\t");
+				System.out.print(rs.getString("ENAME")+"\t");
+				System.out.print(rs.getFloat("ESAL")+"\t");
+				System.out.println(rs.getString("EADDR"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally
+		{
+			try {
+				rs.close();
+				st.close();
+				con.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
+}
+----------------------------------------------------------------------------------------------------
+App.java
+-------------
+package com.ashsoft;
+
+import com.ashsoft.jdbc.JdbcApp;
+
+/**
+ * Hello world!
+ *
+ */
+public class App 
+{
+    public static void main( String[] args )
+    {
+        JdbcApp jdbcApp= new JdbcApp();
+        jdbcApp.getStudentDetails();
+    }
+}
