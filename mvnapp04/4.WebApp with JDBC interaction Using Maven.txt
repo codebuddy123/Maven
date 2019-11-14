@@ -1,0 +1,216 @@
+pom.xml
+--------------
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>mvnapp04</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>mvnapp04 Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>oracle-jdbc</artifactId>
+			<version>11.2-xe</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.14</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>mvnapp04</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.3-SNAPSHOT</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+----------------------------------------------------------------------------------------------------
+loginform.html
+--------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Page</h3>
+<form action="./login" method="POST">
+<center>
+<table>
+<tr>
+	<td>User Name</td>
+	<td><input type="text" name="uname"/></td>
+</tr>
+<tr>
+	<td>Password</td>
+	<td><input type="password" name="upwd"/></td>
+</tr>
+<tr>
+	<td><input type="submit" value="Login"></td>
+</tr>
+</table>
+</center>
+</form>
+</body>
+</html>
+---------------------------------------------------------------------------------------------------
+success.html
+-------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Status</h3>
+<h1 style="color:green" align="center">
+LOGIN SUCCESS
+</h1>
+<h3 align="center">
+<a href="./loginform.html">|Login Page|</a>
+</h3>
+</body>
+</html>
+-----------------------------------------------------------------------------------------------------
+failure.html
+------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Status</h3>
+<h1 style="color:red" align="center">
+LOGIN FAILURE
+</h1>
+<h3 align="center">
+<a href="./loginform.html">|Login Page|</a>
+</h3>
+</body>
+</html>
+=============================================================
+UserService.java
+--------------------------
+package com.ashsoft.services;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class UserService {
+   Connection con=null;
+   Statement st=null;
+   ResultSet rs=null;
+   public UserService() 
+   {
+	  try {
+		  Class.forName("oracle.jdbc.OracleDriver");
+		  con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","system","ashish");
+		  st=con.createStatement();
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+ }
+   
+   // The method which checks if user exists in database
+   public String checkLogin(String uname,String upwd) {
+	   String status="";
+	   
+	   try {
+		rs=st.executeQuery("select * from reg_Users where UNAME='"+uname+"'and UPWD='"+upwd+"'");
+		boolean b=rs.next(); //returns true if a record exists in ResultSet
+		if(b==true)  //if user exists
+		{
+			status="success";
+		}
+		else
+		{
+			status="failure";
+		}
+	} catch (Exception e) {
+		status="failure";
+		e.printStackTrace();
+	}
+	   return status;
+   }
+}
+==============================================================
+LoginServlet.java
+----------------------------
+package com.ashsoft.servlets;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.ashsoft.services.UserService;
+
+public class LoginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String uname=request.getParameter("uname");
+		String upwd=request.getParameter("upwd");
+		
+		RequestDispatcher rd=null;
+		
+		UserService userService= new UserService();
+		String status=userService.checkLogin(uname, upwd);
+		
+		if(status.equals("success"))
+		{
+			rd=request.getRequestDispatcher("success.html");
+			rd.forward(request, response);
+		}
+		else
+		{
+			rd=request.getRequestDispatcher("failure.html");
+			rd.forward(request, response);
+		}
+	}
+
+}
