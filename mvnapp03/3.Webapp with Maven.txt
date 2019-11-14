@@ -1,0 +1,173 @@
+Configurations Required in pom
+----------------------------------------------
+1)compiler java 8 plugin
+2)Tomcat 7 maven plugin or maven dependency
+3)servlet-api dependency
+---------------------------------------------------------------------
+Running the program
+-----------------------------
+Right click on Project,click Run as, click "maven build ..."
+Under goals type "tomcat:run -Dmaven.tomcat.port=6666"
+Click Run button.
+*Open the inbuilt browser and paste the URL given in server log
+and access the application.
+*Above step ensures, the default port is changed to 6666 from 8080
+while starting the inbuilt tomcat server in maven.
+
+------------------------------------------------------------------------------------------------
+pom.xml
+-------------
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ashsoft</groupId>
+	<artifactId>mvnapp03</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>mvnapp03 Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+	<build>
+		<finalName>mvnapp03</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.3-SNAPSHOT</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+
+
+
+--------------------------------------------------------------------------------------------------
+loginform.html
+----------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Page</h3>
+<form action="./login" method="POST">
+<center>
+<table>
+<tr>
+	<td>User Name</td>
+	<td><input type="text" name="uname"/></td>
+</tr>
+<tr>
+	<td>Password</td>
+	<td><input type="password" name="upwd"/></td>
+</tr>
+<tr>
+	<td><input type="submit" value="Login"></td>
+</tr>
+</table>
+</center>
+</form>
+</body>
+</html>
+---------------------------------------------------------------------------------------------------
+success.html
+------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Status</h3>
+<h1 style="color:green" align="center">
+LOGIN SUCCESS
+</h1>
+<h3 align="center">
+<a href="./loginform.html">|Login Page|</a>
+</h3>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------
+failure.html
+------------------
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<h2 style="color:maroon" align="center">Ashish Software Solutions</h2>
+<h3 style="color:blue" align="center">User Login Status</h3>
+<h1 style="color:red" align="center">
+LOGIN FAILURE
+</h1>
+<h3 align="center">
+<a href="./loginform.html">|Login Page|</a>
+</h3>
+</body>
+</html>
+------------------------------------------------------------------------------------------------------LoginServlet.java
+------------------------
+package com.ashsoft.servlets;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class LoginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String uname=request.getParameter("uname");
+		String upwd=request.getParameter("upwd");
+		
+		RequestDispatcher rd=null;
+		if(uname.equalsIgnoreCase("ashish") && upwd.equals("ashish"))
+		{
+			rd=request.getRequestDispatcher("success.html");
+			rd.forward(request, response);
+		}
+		else
+		{
+			rd=request.getRequestDispatcher("failure.html");
+			rd.forward(request, response);
+		}
+	}
+
+}
