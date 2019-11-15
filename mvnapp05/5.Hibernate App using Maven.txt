@@ -1,0 +1,198 @@
+Configurations in pom
+------------------------------------
+1)Compiler plugin
+2)Oracle jdbc depedency
+3)Hibernate core dependency
+------------------------------------------------------------------------------------------------------
+pom.xml
+-------------
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.ashsoft</groupId>
+	<artifactId>mvnapp05</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>mvnapp05</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>oracle-jdbc</artifactId>
+			<version>11.2-xe</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.3.11.Final</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+------------------------------------------------------------------------------------------------------
+Employee.java
+---------------------
+package com.ashsoft.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "emp1")
+public class Employee {
+	@Id
+	@Column(name = "ENO")
+	private int eno;
+	
+	@Column(name = "ENAME")
+	private String ename;
+	
+	@Column(name = "ESAL")
+	private float esal;
+	
+	@Column(name = "EADDR")
+	private String eaddr;
+	
+	public int getEno() {
+		return eno;
+	}
+	public void setEno(int eno) {
+		this.eno = eno;
+	}
+	public String getEname() {
+		return ename;
+	}
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+	public float getEsal() {
+		return esal;
+	}
+	public void setEsal(float esal) {
+		this.esal = esal;
+	}
+	public String getEaddr() {
+		return eaddr;
+	}
+	public void setEaddr(String eaddr) {
+		this.eaddr = eaddr;
+	}
+	
+}
+----------------------------------------------------------------------------------------------------
+hibernate.cfg.xml
+---------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="connection.driver_Class">oracle.jdbc.OracleDriver</property>
+		<property name="connection.url">jdbc:oracle:thin:@localhost:1521:xe</property>
+		<property name="connection.user">system</property>
+		<property name="connection.password">ashish</property>
+		<property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
+		<property name="show_sql">true</property>
+		<mapping class="com.ashsoft.entity.Employee"/>
+	</session-factory>
+</hibernate-configuration>
+------------------------------------------------------------------------------------------------------
+ClientApp.java
+---------------------
+package com.ashsoft.client;
+
+
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+
+import com.ashsoft.entity.Employee;
+
+public class ClientApp {
+	
+	public void insertRecord()
+	{
+		SessionFactory sf=null;
+		Session session=null;
+		Transaction tx=null;
+		try {
+			Configuration cfg= new Configuration();
+			cfg.configure("/com/ashsoft/resources/hibernate.cfg.xml");
+			
+			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+			builder=builder.applySettings(cfg.getProperties());
+			StandardServiceRegistry registry=builder.build();
+			sf=cfg.buildSessionFactory(registry);
+			session=sf.openSession();
+			tx=session.beginTransaction();
+			
+			Employee emp= new Employee();
+			emp.setEno(333);
+			emp.setEname("Virat");
+			emp.setEsal(60000);
+			emp.setEaddr("Hyd");
+			
+			session.save(emp);
+			tx.commit();
+			System.out.println("Employee Inserted Successfully");
+		} catch (Exception e) {
+			tx.rollback();
+			System.out.println("Employee Insertion Failure");
+			e.printStackTrace();
+		}
+		finally
+		{
+			sf.close();
+		}
+	}
+}
+----------------------------------------------------------------------------------------------------
+App.java
+------------
+package com.ashsoft;
+
+import com.ashsoft.client.ClientApp;
+
+public class App 
+{
+    public static void main( String[] args )
+    {
+       ClientApp app= new ClientApp();
+       app.insertRecord();
+    }
+}
